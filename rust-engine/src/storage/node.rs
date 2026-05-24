@@ -9,7 +9,7 @@ pub struct NodeRecord {
     pub first_out_edge_ptr: u64,
     pub first_in_edge_ptr: u64,
     pub label_ptr: u64,
-    pub desc_ptr: u64,            // Moved up to maintain 8-byte alignment!
+    pub desc_ptr: u64,            // Placed here to maintain 8-byte alignment
 
     // --- 4-Byte Fields (8 bytes total) ---
     pub label_len: u32,

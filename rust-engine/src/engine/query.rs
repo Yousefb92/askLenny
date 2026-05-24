@@ -5,7 +5,7 @@ use serde::Serialize;
 use zerocopy::FromBytes;
 use std::collections::{HashSet, VecDeque};
 
-// This is the "Lightweight" version of a node we send to Python
+// Serializable summary returned by list_all_nodes - contains only the fields Python needs.
 #[derive(Serialize)]
 pub struct NodeSummary {
     pub id: u64,
@@ -31,17 +31,13 @@ impl LichenEngine {
     pub fn list_all_nodes(&self) -> Vec<NodeSummary> {
         let mut nodes = Vec::new();
 
-        // Loop from 0 to next_node_idx.
-        // Note: Offset starts at 1 * RECORD_SIZE because index 0 is the Header.
+        // Index 0 in the node file is the header, so node records start at offset 1 * RECORD_SIZE.
         for i in 0..self.next_node_idx {
             let offset = ((i + 1) as usize) * RECORD_SIZE;
 
-            // Get the 64-byte slice from the memory map
             let bytes = &self.node_map[offset..offset + RECORD_SIZE];
 
-            // Convert those binary bytes into a Rust struct we can read
             if let Some(record) = NodeRecord::read_from(bytes) {
-                // Ignore nodes that have been "deleted"
                 if record.deleted == 0 {
                     nodes.push(NodeSummary {
                         id: record.id,
@@ -92,7 +88,6 @@ impl LichenEngine {
                 if record.deleted == 1 { continue; }
                 if record.source_id != target_source_id { continue; }
 
-                // --- FIX: Safely slice and cast the raw byte map into an f32 slice ---
                 let start_byte = (record.id as usize) * vector_stride;
                 let end_byte = start_byte + vector_stride;
                 if end_byte > self.vector_map.len() { continue; }
@@ -174,7 +169,6 @@ impl LichenEngine {
                 let label = self.get_string(node.label_ptr, node.label_len);
                 let description = self.get_string(node.desc_ptr, node.desc_len);
 
-                // 1. Resolve Category Strings
                 let cat_str = match node.category {
                     0 => "Database",
                     1 => "Table",
@@ -182,7 +176,7 @@ impl LichenEngine {
                     _ => "Unknown",
                 };
 
-                // 2. NEW: Decode binary Data Type integer to explicit SQL type names
+                // Map the numeric data_type field to a SQL type string for the LLM context
                 let type_str = match node.data_type {
                     1 => "INT/INTEGER",
                     2 => "VARCHAR/NVARCHAR",
@@ -192,7 +186,7 @@ impl LichenEngine {
                     _ => "UNKNOWN_TYPE",
                 };
 
-                // 3. NEW: Decode binary Engine Type integer to explicit Dialect definitions
+                // Map the numeric engine_type field to a SQL dialect string for the LLM context
                 let engine_str = match node.engine_type {
                     1 => "Microsoft SQL Server (T-SQL/SQLExpress)",
                     2 => "PostgreSQL (PL/pgSQL)",
@@ -201,18 +195,15 @@ impl LichenEngine {
                     _ => "Standard ANSI SQL",
                 };
 
-                // 4. NEW: Pull your Primary Key flag into context
                 let pk_suffix = if node.is_pk == 1 { " [PRIMARY KEY]" } else { "" };
 
-                // 5. Build tailored text blocks based on node category
+                // Columns include data type; databases and tables include engine dialect
                 if node.category == 2 {
-                    // Columns need to show Data Type constraints
                     context.push_str(&format!(
                         "[{}] (ID: {}, Depth: {}){}\nLabel: {}\nData Type: {}\nDescription: {}\n\n",
                         cat_str, current_id, depth, pk_suffix, label, type_str, description
                     ));
                 } else {
-                    // Databases and Tables dictate the Engine dialect layout
                     context.push_str(&format!(
                         "[{}] (ID: {}, Depth: {})\nLabel: {}\nEngine Dialect: {}\nDescription: {}\n\n",
                         cat_str, current_id, depth, label, engine_str, description

@@ -16,8 +16,8 @@ pub struct EdgeRecord {
 
     // AI Schema Metadata
     pub edge_type: u8,          // 1 byte  (0 = Contains/Nested, 1 = Foreign Key/Link)
-    pub cardinality: u8,        // 1 byte  (NEW: 0=Unknown, 1=OneToOne, 2=OneToMany, 3=ManyToMany)
-    pub is_required: u8,        // 1 byte  (NEW: 0=Nullable/Left Join, 1=Required/Inner Join)
+    pub cardinality: u8,        // 1 byte  (0=Unknown, 1=OneToOne, 2=OneToMany, 3=ManyToMany)
+    pub is_required: u8,        // 1 byte  (0=Nullable/Left Join, 1=Required/Inner Join)
 
     pub _alignment_gap: [u8; 1], // 1 byte  (Total so far: 32 + 4 + 1 + 1 + 1 + 1 = 40 bytes)
 

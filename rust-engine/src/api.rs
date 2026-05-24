@@ -79,7 +79,6 @@ pub async fn add_edge(
 ) -> impl IntoResponse {
     let mut db = state.db.write().await;
 
-    // We will build this method in engine/mutate.rs
     db.add_schema_edge(
         payload.source_id,
         payload.target_id,
@@ -130,19 +129,18 @@ pub async fn vector_search(
 ) -> impl IntoResponse {
     let db = state.db.read().await;
 
-    // 1. Get the matching IDs
+    // Find the closest matching nodes by cosine similarity
     let matched_nodes = db.cosine_similarity_search(&payload.query_embedding, payload.limit, payload.source_id);
 
-    // 2. Loop through the matches and build the full GraphRAG text string immediately
+    // Walk each match one level deep and concatenate the GraphRAG context blocks
     let mut complete_context = String::new();
     for &node_id in &matched_nodes {
-        // Walk the graph 1 level deep for each match
         let node_context = db.extract_graphrag_context(node_id, 1);
         complete_context.push_str(&node_context);
         complete_context.push_str("\n---\n");
     }
 
-    // 3. Return everything to Python in one single network round-trip!
+    // Return matched IDs and the assembled context in a single response
     (StatusCode::OK, Json(VectorSearchRes {
         matched_node_ids: matched_nodes,
         graphrag_context: complete_context
@@ -166,13 +164,12 @@ pub async fn get_ai_context(
 ) -> impl IntoResponse {
     let db = state.db.read().await;
 
-    // We will build this method in engine/query.rs
     let prompt = db.extract_graphrag_context(payload.starting_node_id, payload.max_depth);
 
     (StatusCode::OK, Json(ContextRes { markdown_prompt: prompt }))
 }
 
-// API for checking if DB node exists
+// Checks whether a node with the given label and category exists in the graph.
 #[derive(Deserialize)]
 pub struct NodeLookupReq {
     pub label: String,
@@ -189,23 +186,19 @@ pub async fn lookup_node(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<NodeLookupReq>,
 ) -> impl IntoResponse {
-    // Acquire shared read lock (doesn't block other readers)
     let db = state.db.read().await;
 
-    // We call a helper method on your database engine (we'll define this next)
     match db.find_node_idx_by_label(&payload.label, payload.category) {
         Some(node_id) => {
-            // Node found! Return 200 OK with exists: true and the ID
             (StatusCode::OK, Json(NodeLookupRes { exists: true, node_id: Some(node_id) }))
         }
         None => {
-            // Node NOT found! Return 200 OK with exists: false and null ID
             (StatusCode::OK, Json(NodeLookupRes { exists: false, node_id: None }))
         }
     }
 }
 
-// Node description mutation
+// Updates the plain-English description for an existing node.
 #[derive(Deserialize)]
 pub struct UpdateDescReq {
     pub node_id: u64,

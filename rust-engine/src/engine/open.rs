@@ -15,7 +15,7 @@ impl LichenEngine {
         let string_path = path.as_ref().join("strings.dat");
         let vector_path = path.as_ref().join("vectors.dat");
 
-        // Temporary hardcoded limits (You can pull these from config.toml later)
+        // Hardcoded limits - lichen_config.toml is parsed but not yet wired into open()
         let max_nodes: u64 = 100_000;
         let max_edges: u64 = 500_000;
         let string_heap_size: u64 = 10 * 1024 * 1024; // 10 MB
@@ -89,7 +89,7 @@ impl LichenEngine {
             }
         }
 
-        // 5. Return the fully operational engine
+        // 5. Return the initialized engine
         Ok(Self {
             node_map,
             edge_map,

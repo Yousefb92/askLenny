@@ -12,9 +12,8 @@ use axum::routing::get;
 use tokio::sync::RwLock;
 use crate::api::{health_check, add_node, add_edge, list_nodes, list_edges};
 
-// This holds our application state.
-// Arc allows multiple threads to share ownership.
-// RwLock allows multiple concurrent readers (for querying) but exclusive access for writers (adding tables).
+// Shared application state passed to every Axum route handler.
+// Arc + RwLock allows concurrent reads (vector search, listing) while serialising writes (node/edge insertion).
 pub struct AppState {
     pub db: Arc<RwLock<LichenEngine>>,
 }
@@ -29,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Booting LichenEngine...");
 
-    // 1. Initialize the Memory-Mapped Engine (We will build this in engine/open.rs)
+    // 1. Open the memory-mapped engine and rebuild in-memory indexes from disk
     let engine = LichenEngine::open(db_path, config_path)?;
     println!("Engine booted. Nodes: {}, Edges: {}", engine.next_node_idx, engine.next_edge_idx);
 
@@ -51,14 +50,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/query/vector_search", axum::routing::post(api::vector_search))
         .route("/query/context", axum::routing::post(api::get_ai_context))
 
-        // Getting current Schema definition and mapping - run each time app boots
+        // Schema state - read by Python on startup to rebuild its in-memory cache
         .route("/schema/nodes", axum::routing::get(api::list_nodes))
         .route("/schema/edges", axum::routing::get(api::list_edges))
-        // Attach the database state to all routes
 
-        //     lookup function to check if DB node exists
+        // Check whether a node already exists before attempting to insert
         .route("/schema/node/lookup", axum::routing::post(api::lookup_node))
-        // Node description mutation
+        // Update the plain-English description for an existing node
         .route("/node/updateDescription", axum::routing::post(api::update_description))
         .with_state(shared_state);
 

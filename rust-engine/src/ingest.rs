@@ -1,3 +1,6 @@
+// Bulk CSV ingestion - not currently wired up.
+// References EngineIndex and add_node/add_edge signatures that no longer match the engine API.
+// Kept as a reference for a future bulk-load path.
 use crate::engine::{LichenEngine, EngineIndex};
 use std::error::Error;
 use csv::Reader;

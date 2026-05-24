@@ -7,6 +7,6 @@ pub struct DbHeader {
     pub _padding1: u32,
     pub node_count: u64,
     pub edge_count: u64,
-    pub string_ptr: u64,     // Ensure this is here!
+    pub string_ptr: u64,     // Offset of the next free byte on the string heap
     pub _padding2: [u8; 32], // Adjusted to keep total at 64 bytes
 }
