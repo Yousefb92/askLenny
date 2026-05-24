@@ -14,7 +14,7 @@ class DBConnector(BaseModel):
     server: str
     port: int
     username: str
-    password_env_var: str
+    password: str
     database: str
     # Optional list of SQL schemas to include (e.g. ["Sales","Person","Production"]).
     # If omitted, all non-system schemas are included automatically.

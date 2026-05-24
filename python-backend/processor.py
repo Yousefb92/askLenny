@@ -6,7 +6,7 @@ from core.config import config
 
 load_dotenv()
 
-RUST_API = "http://localhost:3000"
+RUST_API = config.rust_engine_url
 
 # ── Type helpers ──────────────────────────────────────────────────────────────
 
@@ -88,13 +88,14 @@ def generate_multi_db_proposal():
 
         print(f"--- Analysing {db_name} (ID: {raw_source} → Hash: {hashed_id}) ---")
 
-        password = connector.password_env_var
+        password = connector.password
         conn_str = (
-            f"DRIVER={{SQL Server}};"
+            f"DRIVER={{ODBC Driver 18 for SQL Server}};"
             f"SERVER={connector.server};"
             f"DATABASE={db_name};"
             f"UID={connector.username};"
-            f"PWD={password}"
+            f"PWD={password};"
+            f"TrustServerCertificate=yes"
         )
 
         try:
