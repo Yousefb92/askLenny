@@ -1,0 +1,44 @@
+# ── Secrets ───────────────────────────────────────────────────────────────
+.env
+**/.env
+
+# ── Rust ──────────────────────────────────────────────────────────────────
+rust-engine/target/
+# binary graph data — never commit
+rust-engine/lichen_persistent/
+
+# ── Node / frontend ───────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+product-webpage/node_modules/
+product-webpage/.next/
+
+# ── Python ────────────────────────────────────────────────────────────────
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# ── IDE / tool settings ───────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+**/.claude/
+
+# ── Product webpage (deployed separately) ────────────────────────────────
+product-webpage/
+
+# ── Dev data / scratch files ──────────────────────────────────────────────
+rust-engine/initial_load.csv
+WEBSITE_PLAN.md
+WEB_CONTENT_BRIEF.md
+rust-engine/WEB_CONTENT_BRIEF.md
+rust-engine/CRITIQUE.md
+rust-engine/LICHEN_ENGINE.md
+
+# ── Logs / temp ───────────────────────────────────────────────────────────
+*.log
+replay_pid*.log
+
+# ── Old Docker Build copy ─────────────────────────────────────────────────
+Docker Build/

@@ -1,0 +1,38 @@
+﻿connectors:
+#  - id: "sqlexpress_test"
+#    display_name: "Local SQL Express"
+#    engine: "mssql"
+##    server: "DESKTOP-K87TNA6\\SQLEXPRESS01"
+#    server: "127.0.0.1"
+#    port: 1433
+#    username: "lichen_svc"
+#    password_env_var: "password"
+#    database: "testDB"
+  - id: "AdventureWorks 2019"
+    display_name: "AdventureWorks 2019"
+    engine: "mssql"
+#    server: "DESKTOP-K87TNA6\\SQLEXPRESS01"
+    server: "127.0.0.1"
+    port: 1433
+    username: "lichen_svc"
+    password_env_var: "password"
+    database: "AdventureWorks2019"
+    # Only include these schemas â€” omit the field entirely to scan all non-system schemas.
+    schemas:
+      - "Sales"
+      - "Person"
+      - "Production"
+      - "Purchasing"
+      - "HumanResources"
+ai_integration:
+#  If using the standard implementation define the model for genAI to use
+  model_to_use: 'gemini-3.1-flash-lite'
+  # base_url is optional. Omit it to use the default genai library
+  # Set it to route through any OpenAI-compatible server instead, e.g.:
+  #   base_url: 'http://localhost:11434/v1'                                         # Ollama (local, zero egress)
+  #   base_url: 'https://your-resource.openai.azure.com/openai/deployments/gpt-4'  # Azure OpenAI
+  #   base_url: 'http://vllm-server:8000/v1'                                        # vLLM / LM Studio / LocalAI
+  # Claude models (anthropic SDK — no base_url needed, just set the model name):
+  #   model_to_use: 'claude-opus-4-5'
+  #   model_to_use: 'claude-sonnet-4-5'
+  #   model_to_use: 'claude-haiku-3-5'

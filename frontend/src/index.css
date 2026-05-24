@@ -1,0 +1,66 @@
+:root {
+  /* ── Backgrounds ─────────────────────────────────────────── */
+  --bg-base:     #070c15;   /* deepest — page canvas          */
+  --bg-surface:  #0d1424;   /* card / pane backgrounds        */
+  --bg-elevated: #131c30;   /* hover / active states          */
+  --bg-input:    #0a1020;   /* textarea / input backgrounds   */
+
+  /* ── Borders ─────────────────────────────────────────────── */
+  --border:       #1c2a42;  /* default card border            */
+  --border-light: #243350;  /* slightly brighter              */
+
+  /* ── Text ────────────────────────────────────────────────── */
+  --text-primary:   #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted:     #475569;
+
+  /* ── Accent (Violet) ─────────────────────────────────────── */
+  --accent:      #7c3aed;
+  --accent-mid:  #8b5cf6;
+  --accent-soft: rgba(124, 58, 237, 0.15);
+
+  /* ── Brand rays (matching product page) ─────────────────── */
+  --brand-green:  #1fff90;
+  --brand-indigo: #6677ff;
+  --brand-pink:   #ff3fa0;
+
+  /* ── Status palette ──────────────────────────────────────── */
+  --new-color:     #34d399;
+  --new-bg:        rgba(16, 185, 129, 0.09);
+  --new-border:    rgba(52, 211, 153, 0.60);
+
+  --synced-color:  #38bdf8;
+  --synced-bg:     rgba(56, 189, 248, 0.07);
+  --synced-border: rgba(56, 189, 248, 0.55);
+
+  --modified-color:  #fbbf24;
+  --modified-bg:     rgba(245, 158, 11, 0.09);
+  --modified-border: rgba(251, 191, 36, 0.62);
+
+  --pending-color:  #c4b5fd;
+  --pending-bg:     rgba(167, 139, 250, 0.10);
+  --pending-border: rgba(196, 181, 253, 0.60);
+
+  /* ── Typography ──────────────────────────────────────────── */
+  --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, p { margin: 0; }
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

@@ -1,0 +1,11 @@
+[storage]
+node_limit = 20_000_000
+edge_limit = 20_000_000
+string_heap_mb = 500
+
+[categories]
+# In TOML, you can use quotes for keys, but Serde needs them to look like integers
+"1" = "Customer"
+"2" = "Staff"
+"3" = "Product"
+"4" = "Location"

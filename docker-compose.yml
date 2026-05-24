@@ -1,0 +1,41 @@
+services:
+
+  # ── Rust graph engine ──────────────────────────────────────────────────
+  rust-engine:
+    build: ./rust-engine
+    container_name: rust-engine
+    expose:
+      - "3000"                  # internal only — not reachable from outside Docker
+    volumes:
+      - lichen_data:/app/lichen_persistent   # persist the binary graph database
+    restart: unless-stopped
+
+  # ── Python app layer ──────────────────────────────────────────────────
+  python-app:
+    build: ./python-backend
+    container_name: python-app
+    expose:
+      - "8000"                  # internal only — frontend nginx proxies to here
+    environment:
+      RUST_ENGINE_URL: http://rust-engine:3000
+      AI_API_KEY: ${AI_API_KEY}             # injected from .env at the repo root
+    volumes:
+      # Bind-mount connectors.yaml so it can be edited without rebuilding
+      - ./python-backend/connectors.yaml:/app/connectors.yaml:ro
+    depends_on:
+      - rust-engine
+    restart: unless-stopped
+
+  # ── React frontend (served by nginx) ──────────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"                 # only port exposed to the host / network
+    depends_on:
+      - python-app
+    restart: unless-stopped
+
+# Named volume — graph data persists across container restarts and rebuilds
+volumes:
+  lichen_data:
